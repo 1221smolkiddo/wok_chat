@@ -62,7 +62,9 @@ from app.schemas import (
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 STATIC_DIR = BASE_DIR / "static"
-UPLOAD_DIR = BASE_DIR / "uploads"
+UPLOAD_DIR = Path(settings.UPLOAD_DIR)
+if not UPLOAD_DIR.is_absolute():
+    UPLOAD_DIR = BASE_DIR / UPLOAD_DIR
 MESSAGE_TTL = timedelta(hours=settings.MESSAGE_TTL_HOURS)
 MAX_UPLOAD_SIZE = 20 * 1024 * 1024
 ALLOWED_MEDIA_TYPES = {"image/", "video/", "audio/"}

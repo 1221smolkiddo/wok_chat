@@ -12,6 +12,7 @@ class Settings(BaseSettings):
     DB_ECHO: bool = False
     ENVIRONMENT: str = "development"
     FORCE_HTTPS: bool = False
+    UPLOAD_DIR: str = "uploads"
     LOGIN_MAX_ATTEMPTS: int = 5
     LOGIN_WINDOW_SECONDS: int = 900
     CORS_ORIGINS: list[str] = Field(default_factory=lambda: ["http://127.0.0.1:8000", "http://localhost:8000"])

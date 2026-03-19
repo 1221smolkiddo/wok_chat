@@ -2,16 +2,15 @@
 
 Two-person realtime chat built with FastAPI, PostgreSQL, JWT auth, WebSockets, client-side encrypted message text, and encrypted-at-rest media storage.
 
-## What To Commit
+## Repo Status
 
-Commit the app code, `requirements.txt`, `railway.json`, `.env.example`, and this `README.md`.
+This repo is ready for:
 
-Do not commit:
+- GitHub push
+- Render deployment via `render.yaml`
+- Railway deployment via `railway.json`
 
-- `.env`
-- `uploads/`
-- `venv/` or `.venv/`
-- temporary log files
+Keeping both files is fine. Render ignores `railway.json`, and Railway ignores `render.yaml`.
 
 ## Local Run
 
@@ -28,68 +27,92 @@ pip install -r requirements.txt
 uvicorn app.main:app --reload
 ```
 
-## GitHub Push
-
-```bash
-git init
-git add .
-git commit -m "Prepare WokChat for Railway deployment"
-git branch -M main
-git remote add origin <your-github-repo-url>
-git push -u origin main
-```
-
-## Railway Deploy
-
-1. Push this project to GitHub.
-2. Create a new Railway project.
-3. Choose `Deploy from GitHub repo`.
-4. Select this repository.
-5. Add a PostgreSQL database service in Railway.
-6. Copy your environment variables into Railway.
-7. Railway will use `railway.json` to start the app.
-8. Open the generated Railway domain and test both logins.
-
-## Railway Environment Variables
-
-Set these in Railway:
+## Important Env Vars
 
 - `DATABASE_URL`
 - `SECRET_KEY`
-- `ALGORITHM=HS256`
-- `ACCESS_TOKEN_EXPIRE_MINUTES=1440`
-- `MESSAGE_TTL_HOURS=48`
-- `CLEANUP_INTERVAL_SECONDS=300`
-- `DB_ECHO=false`
-- `ENVIRONMENT=production`
-- `FORCE_HTTPS=true`
-- `LOGIN_MAX_ATTEMPTS=5`
-- `LOGIN_WINDOW_SECONDS=900`
+- `ENVIRONMENT`
+- `FORCE_HTTPS`
+- `CORS_ORIGINS`
+- `TRUSTED_HOSTS`
 - `USER_ONE_USERNAME`
 - `USER_ONE_PASSWORD`
 - `USER_TWO_USERNAME`
 - `USER_TWO_PASSWORD`
+- `UPLOAD_DIR`
 
-Then update these with your real deployed origin:
+## Render Deploy
 
-- `CORS_ORIGINS=["https://your-app.up.railway.app"]`
-- `TRUSTED_HOSTS=["your-app.up.railway.app"]`
+This repo includes [`render.yaml`](./render.yaml), so Render can create the web service and database from the repo.
 
-If you later attach a custom domain, replace those with your real domain and optionally keep the Railway domain too.
+### Render steps
 
-## Important Notes
+1. Push the repo to GitHub.
+2. Go to Render.
+3. Open `Blueprints`.
+4. Create a new Blueprint instance from this repository.
+5. Render will detect `render.yaml`.
+6. Review the generated services:
+   - web service: `wok-chat`
+   - database: `wok-chat-db`
+7. Fill in the missing environment variables in Render:
+   - `SECRET_KEY`
+   - `USER_ONE_USERNAME`
+   - `USER_ONE_PASSWORD`
+   - `USER_TWO_USERNAME`
+   - `USER_TWO_PASSWORD`
+   - `CORS_ORIGINS`
+   - `TRUSTED_HOSTS`
+8. Deploy.
 
-- Both users must use the same `Chat key` on login to read encrypted messages.
-- Message text/captions are client-side encrypted when a chat key is used.
-- Attachments are not full end-to-end encrypted yet; they are protected in transit and encrypted at rest on the server.
-- Realtime messaging, typing indicators, and online state work while both users have the app open.
-- This app is a good fit for Railway because it uses WebSockets.
+### Render production values
 
-## Production Checklist
+Use values like:
 
-- Use a strong `SECRET_KEY` with at least 32 characters.
-- Set final usernames and passwords in Railway variables.
-- Set `ENVIRONMENT=production`.
-- Set the correct `CORS_ORIGINS` and `TRUSTED_HOSTS`.
-- Verify both users can log in and send messages.
-- Verify WebSocket updates work from two different devices.
+```env
+ENVIRONMENT=production
+FORCE_HTTPS=true
+DB_ECHO=false
+ALGORITHM=HS256
+ACCESS_TOKEN_EXPIRE_MINUTES=1440
+MESSAGE_TTL_HOURS=48
+CLEANUP_INTERVAL_SECONDS=300
+LOGIN_MAX_ATTEMPTS=5
+LOGIN_WINDOW_SECONDS=900
+UPLOAD_DIR=uploads
+```
+
+After Render gives you a live domain, set:
+
+```env
+CORS_ORIGINS=["https://your-app.onrender.com"]
+TRUSTED_HOSTS=["your-app.onrender.com"]
+```
+
+If you later attach a custom domain, replace those values with the custom domain.
+
+## Railway Deploy
+
+This repo also includes [`railway.json`](./railway.json) if you still want to deploy there later.
+
+## Git Ignore
+
+Do not commit:
+
+- `.env`
+- `uploads/`
+- `venv/` or `.venv/`
+- temp log files
+
+## Security Notes
+
+- Both users must use the same `Chat key` on login to read encrypted text messages.
+- Message text and captions are client-side encrypted when a chat key is used.
+- Attachments are not full end-to-end encrypted yet.
+- Realtime messaging, typing indicators, and presence require both users to have the app open.
+
+## Platform Notes
+
+- Render supports WebSockets, so it fits this app's realtime behavior.
+- The current `UPLOAD_DIR=uploads` setting stores uploaded media on the service filesystem.
+- If you redeploy or restart on a platform with ephemeral storage, uploaded attachments may not persist unless you use a persistent disk or external object storage later.

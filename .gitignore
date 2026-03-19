@@ -1,0 +1,14 @@
+.env
+.venv/
+venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+.mypy_cache/
+uvicorn.out.txt
+uvicorn.err.txt
+uploads/
+.DS_Store
+Thumbs.db

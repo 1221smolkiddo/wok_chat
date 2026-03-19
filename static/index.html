@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>WokChat</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Manrope:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/static/styles.css" />
+  </head>
+  <body>
+    <main class="login-shell" id="login-shell">
+      <section class="login-card">
+        <div class="login-brand">
+          <div class="brand-mark">W</div>
+          <div>
+            <p class="eyebrow">Private messenger</p>
+            <h1>WokChat</h1>
+          </div>
+        </div>
+        <p class="muted">Sign in with one of the two configured accounts to enter your private chat.</p>
+        <form id="auth-form" class="auth-form">
+          <label>
+            <span>Username</span>
+            <input id="username" name="username" maxlength="30" required />
+          </label>
+          <label>
+            <span>Password</span>
+            <input id="password" name="password" type="password" minlength="1" required />
+          </label>
+          <label>
+            <span>Chat key</span>
+            <input id="chat-key" name="chat_key" type="password" minlength="6" required />
+          </label>
+          <button type="submit" class="primary-btn">Enter chat</button>
+        </form>
+      </section>
+    </main>
+
+    <main class="app-shell hidden" id="app-shell">
+      <section class="screen home-screen" id="home-screen">
+        <header class="topbar">
+          <div>
+            <p class="eyebrow">Chats</p>
+            <h2>WokChat</h2>
+            <p class="muted" id="welcome-label">Welcome</p>
+          </div>
+          <div class="topbar-actions">
+            <button type="button" class="icon-btn profile-btn" id="profile-btn" aria-label="Open profile menu">&#9786;</button>
+            <div class="profile-menu hidden" id="profile-menu">
+              <p class="menu-label" id="profile-name">Signed in</p>
+              <button type="button" id="theme-toggle">Toggle theme</button>
+              <button type="button" id="clear-chat-btn">Clear chat for me</button>
+              <button type="button" id="logout-btn">Log out</button>
+            </div>
+          </div>
+        </header>
+
+        <div class="security-banner hidden" id="security-banner"></div>
+
+        <section class="home-panel">
+          <div class="home-search-wrap">
+            <input id="home-search" class="search-input" type="search" placeholder="Search your chat" />
+          </div>
+          <div class="chat-list" id="chat-list"></div>
+        </section>
+      </section>
+
+      <section class="screen chat-screen hidden" id="chat-screen">
+        <header class="chat-topbar">
+          <button type="button" class="icon-btn back-btn" id="back-btn" aria-label="Back to chats">&#8592;</button>
+          <div class="chat-topbar-meta">
+            <h2 id="chat-title">Secure room</h2>
+            <p class="muted" id="peer-name">Waiting for the other user</p>
+          </div>
+          <div class="chat-topbar-side">
+            <input id="search-input" class="search-input chat-search" type="search" placeholder="Search" />
+            <div class="topbar-actions">
+              <button type="button" class="icon-btn profile-btn" id="chat-menu-btn" aria-label="Open chat menu">&#8942;</button>
+              <div class="profile-menu hidden" id="chat-menu">
+                <button type="button" id="chat-clear-btn">Clear chat for me</button>
+              </div>
+            </div>
+            <span class="status-pill" id="connection-pill">Offline</span>
+            <span class="status-pill warn" id="retention-pill">48h auto-delete</span>
+          </div>
+        </header>
+
+        <div class="typing-strip" id="typing-indicator"></div>
+
+        <div class="message-feed" id="message-feed">
+          <div class="empty-state" id="empty-state">
+            <h3>Your private chat lives here</h3>
+            <p>Select the conversation and start texting.</p>
+          </div>
+        </div>
+
+        <form class="composer" id="composer">
+          <div class="composer-tools">
+            <button type="button" class="icon-btn" id="attach-btn" title="Attach photo, video, or audio">+</button>
+            <button type="button" class="icon-btn" id="emoji-btn" title="Insert emoji">&#9786;</button>
+            <button type="button" class="icon-btn" id="record-btn" title="Record voice note">Mic</button>
+            <span class="composer-note" id="composer-note">Text, image, video, or voice message</span>
+          </div>
+          <div class="emoji-tray hidden" id="emoji-tray"></div>
+          <div class="reply-preview hidden" id="reply-preview"></div>
+          <textarea
+            id="message-input"
+            rows="1"
+            maxlength="4000"
+            placeholder="Message"
+          ></textarea>
+          <div class="attachment-preview hidden" id="attachment-preview"></div>
+          <div class="composer-actions">
+            <input
+              class="hidden"
+              id="file-input"
+              type="file"
+              accept="image/*,video/*,audio/*,.heic,.heif,.jpg,.jpeg,.png,.webp,.gif,.mp4,.mov,.webm,.mp3,.m4a,.wav,.ogg"
+            />
+            <button type="submit" class="primary-btn" id="send-btn">Send</button>
+          </div>
+        </form>
+      </section>
+    </main>
+
+    <div class="toast-region" id="toast-region"></div>
+    <div class="confirm-overlay hidden" id="confirm-overlay">
+      <div class="confirm-card">
+        <p class="eyebrow">Confirm action</p>
+        <h3 id="confirm-title">Clear chat?</h3>
+        <p class="muted" id="confirm-message">This will remove the conversation from your account only.</p>
+        <div class="confirm-actions">
+          <button type="button" class="ghost-btn" id="confirm-cancel-btn">Cancel</button>
+          <button type="button" class="primary-btn" id="confirm-ok-btn">Clear chat</button>
+        </div>
+      </div>
+    </div>
+    <div class="lightbox hidden" id="lightbox">
+      <button type="button" class="lightbox-close" id="lightbox-close" aria-label="Close image viewer">Close</button>
+      <img id="lightbox-image" alt="Expanded attachment preview" />
+    </div>
+
+    <script src="/static/app.js" defer></script>
+  </body>
+</html>

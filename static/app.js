@@ -262,6 +262,10 @@ function getMessageTextSync(text) {
 
 function updateTypingLabel() {
   typingIndicator.textContent = state.peerTyping && state.peer ? `${state.peer.username} is typing...` : "";
+  typingIndicator.classList.toggle("active", Boolean(state.peerTyping && state.peer));
+  if (state.peerTyping && state.currentScreen === "chat") {
+    scrollFeedToLatest();
+  }
 }
 
 function isOwnMessage(message) {
@@ -559,12 +563,19 @@ function stopRecording() {
   if (state.recorder && state.isRecording) state.recorder.stop();
 }
 
+function scrollFeedToLatest() {
+  requestAnimationFrame(() => {
+    feed.scrollTop = feed.scrollHeight;
+  });
+}
+
 function syncComposerToViewport() {
   if (!window.visualViewport) return;
   const keyboardInset = Math.max(0, window.innerHeight - window.visualViewport.height - window.visualViewport.offsetTop);
   composer.style.bottom = `${keyboardInset}px`;
   if (state.currentScreen === "chat") {
     feed.style.paddingBottom = `${24 + composer.offsetHeight}px`;
+    scrollFeedToLatest();
   }
 }
 
@@ -761,6 +772,8 @@ function bindHoldMenu(row, message) {
 
 function renderMessages(scrollToBottom = false) {
   state.renderQueued = false;
+  const wasNearBottom = feed.scrollHeight - feed.scrollTop - feed.clientHeight < 140;
+  const shouldStickToBottom = scrollToBottom || wasNearBottom || document.activeElement === messageInput;
   feed.innerHTML = "";
   const messages = visibleMessages();
   if (!messages.length) {
@@ -815,12 +828,7 @@ function renderMessages(scrollToBottom = false) {
     feed.appendChild(row);
   });
 
-  if (scrollToBottom) {
-    feed.scrollTop = feed.scrollHeight;
-    return;
-  }
-  const nearBottom = feed.scrollHeight - feed.scrollTop - feed.clientHeight < 140;
-  if (nearBottom) feed.scrollTop = feed.scrollHeight;
+  if (shouldStickToBottom) scrollFeedToLatest();
 }
 
 function scheduleRender(scrollToBottom = false) {
@@ -1113,6 +1121,7 @@ messageInput.addEventListener("keydown", (event) => {
 messageInput.addEventListener("focus", () => {
   window.setTimeout(() => {
     syncComposerToViewport();
+    scrollFeedToLatest();
     messageInput.scrollIntoView({ block: "nearest" });
   }, 80);
 });

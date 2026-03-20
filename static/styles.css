@@ -387,10 +387,30 @@ label {
 }
 
 .typing-strip {
-  min-height: 26px;
-  padding: 4px 20px 0;
+  min-height: 0;
+  padding: 0 20px;
   color: var(--muted);
-  font-size: 0.92rem;
+  font-size: 0.88rem;
+}
+
+.typing-strip.active {
+  padding: 8px 20px 0;
+}
+
+.typing-strip.active::before {
+  content: "";
+  display: block;
+  width: fit-content;
+}
+
+.typing-strip.active {
+  width: fit-content;
+  max-width: calc(100% - 40px);
+  margin-left: 20px;
+  padding: 8px 12px;
+  border: 1px solid var(--border);
+  border-radius: 18px 18px 18px 8px;
+  background: var(--bubble-other);
 }
 
 .message-feed {
@@ -830,6 +850,11 @@ textarea {
 
   .message-feed {
     padding: 16px 14px 10px;
+  }
+
+  .typing-strip {
+    margin-left: 14px;
+    max-width: calc(100% - 28px);
   }
 
   .message-meta {

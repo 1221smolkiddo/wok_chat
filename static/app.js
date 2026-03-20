@@ -70,7 +70,6 @@ const typingIndicator = document.getElementById("typing-indicator");
 const searchInput = document.getElementById("search-input");
 const homeSearch = document.getElementById("home-search");
 const replyPreview = document.getElementById("reply-preview");
-const sendBtn = document.getElementById("send-btn");
 const lightbox = document.getElementById("lightbox");
 const lightboxImage = document.getElementById("lightbox-image");
 const lightboxClose = document.getElementById("lightbox-close");
@@ -90,6 +89,10 @@ const backBtn = document.getElementById("back-btn");
 const chatMenuBtn = document.getElementById("chat-menu-btn");
 const chatMenu = document.getElementById("chat-menu");
 const chatClearBtn = document.getElementById("chat-clear-btn");
+const chatProfileBtn = document.getElementById("chat-profile-btn");
+const chatDetailsPanel = document.getElementById("chat-details-panel");
+const chatDetailsName = document.getElementById("chat-details-name");
+const chatDetailsStatus = document.getElementById("chat-details-status");
 
 const supportedExtensions = new Set([
   "jpg",
@@ -145,11 +148,11 @@ function detectFileKind(file) {
 
 function setUploadingState(isUploading) {
   state.isUploading = isUploading;
-  sendBtn.disabled = isUploading;
   attachBtn.disabled = isUploading;
   emojiBtn.disabled = isUploading;
   recordBtn.disabled = isUploading;
-  sendBtn.textContent = isUploading ? "Sending..." : "Send";
+  messageInput.disabled = isUploading;
+  messageInput.placeholder = isUploading ? "Sending..." : "Message";
 }
 
 async function api(path, options = {}) {
@@ -309,6 +312,7 @@ function openHomeScreen() {
   homeScreen.classList.remove("hidden");
   chatScreen.classList.add("hidden");
   composer.classList.add("hidden");
+  chatDetailsPanel.classList.add("hidden");
 }
 
 function openChatScreen() {
@@ -317,16 +321,21 @@ function openChatScreen() {
   chatScreen.classList.remove("hidden");
   if (state.token) composer.classList.remove("hidden");
   scheduleRender(true);
-  messageInput.focus();
+  if (window.innerWidth > 760) messageInput.focus();
 }
 
 function updatePeerStatus() {
   if (!state.peer) {
     peerName.textContent = "Waiting for the other user";
+    chatDetailsName.textContent = "Secure room";
+    chatDetailsStatus.textContent = "Waiting for the other user";
     return;
   }
   const presence = state.presence[state.peer.id] || {};
-  peerName.textContent = presence.is_online ? `${state.peer.username} online` : formatLastSeen(presence.last_seen || state.peer.last_seen);
+  const statusText = presence.is_online ? "online" : formatLastSeen(presence.last_seen || state.peer.last_seen);
+  peerName.textContent = statusText;
+  chatDetailsName.textContent = state.peer.username;
+  chatDetailsStatus.textContent = statusText;
   renderChatList();
 }
 
@@ -430,6 +439,7 @@ async function applyConversation(conversation) {
   });
   state.peer = conversation.participants.find((user) => user.id !== state.me.id) || null;
   chatTitle.textContent = state.peer ? state.peer.username : "Secure room";
+  chatDetailsName.textContent = state.peer ? state.peer.username : "Secure room";
   profileName.textContent = state.me ? state.me.username : "Signed in";
   welcomeLabel.textContent = state.me ? `Welcome, ${state.me.username}` : "Welcome";
   updatePeerStatus();
@@ -1026,6 +1036,12 @@ profileBtn.addEventListener("click", () => profileMenu.classList.toggle("hidden"
 chatMenuBtn.addEventListener("click", () => chatMenu.classList.toggle("hidden"));
 backBtn.addEventListener("click", openHomeScreen);
 homeSearch.addEventListener("input", renderChatList);
+chatProfileBtn.addEventListener("click", () => {
+  chatDetailsPanel.classList.toggle("hidden");
+  if (!chatDetailsPanel.classList.contains("hidden")) {
+    searchInput.focus();
+  }
+});
 
 fileInput.addEventListener("change", () => {
   const [file] = fileInput.files;
@@ -1094,6 +1110,7 @@ logoutBtn.addEventListener("click", () => {
   connectionPill.textContent = "Offline";
   connectionPill.classList.remove("online");
   chatList.innerHTML = "";
+  chatDetailsPanel.classList.add("hidden");
   updateAuthState(false);
 });
 
@@ -1103,6 +1120,13 @@ messageInput.addEventListener("input", () => {
   sendTyping(Boolean(messageInput.value.trim()));
   clearTimeout(state.typingTimeout);
   state.typingTimeout = setTimeout(() => sendTyping(false), 1200);
+});
+
+messageInput.addEventListener("keydown", (event) => {
+  if (event.key === "Enter" && !event.shiftKey) {
+    event.preventDefault();
+    composer.requestSubmit();
+  }
 });
 
 searchInput.addEventListener("input", () => {
@@ -1126,6 +1150,9 @@ document.addEventListener("click", (event) => {
   if (!event.target.closest(".topbar-actions")) {
     profileMenu.classList.add("hidden");
     chatMenu.classList.add("hidden");
+  }
+  if (!event.target.closest("#chat-profile-btn") && !event.target.closest("#chat-details-panel")) {
+    chatDetailsPanel.classList.add("hidden");
   }
   if (!event.target.closest(".message-row")) {
     state.activeMenuId = null;

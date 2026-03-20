@@ -221,6 +221,10 @@ label {
   gap: 10px;
 }
 
+.chat-topbar {
+  align-items: center;
+}
+
 .profile-btn,
 .back-btn {
   width: 44px;
@@ -326,10 +330,16 @@ label {
 .chat-topbar-meta {
   min-width: 0;
   flex: 1;
+  padding: 0;
+  background: transparent;
+  text-align: left;
+  color: inherit;
+  display: grid;
+  gap: 4px;
 }
 
 .chat-topbar-side {
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   justify-content: flex-end;
 }
 
@@ -338,6 +348,24 @@ label {
   max-width: 220px;
   padding: 10px 12px;
   border-radius: 999px;
+}
+
+.chat-details-panel {
+  padding: 0 20px 16px;
+  border-bottom: 1px solid var(--border);
+}
+
+.chat-details-card {
+  padding: 16px 18px;
+  border: 1px solid var(--border);
+  border-radius: 24px;
+  background: color-mix(in srgb, var(--panel) 94%, transparent);
+  display: grid;
+  gap: 10px;
+}
+
+.chat-search-label {
+  gap: 10px;
 }
 
 .status-pill {
@@ -554,10 +582,12 @@ label {
 
 .composer {
   border-top: 1px solid var(--border);
-  padding: 18px;
+  padding: 14px 18px calc(14px + env(safe-area-inset-bottom, 0px));
   display: grid;
-  gap: 12px;
+  gap: 10px;
   background: var(--panel-strong);
+  position: sticky;
+  bottom: 0;
 }
 
 .composer-tools,
@@ -568,8 +598,11 @@ label {
   flex-wrap: wrap;
 }
 
-.composer-actions {
-  justify-content: flex-end;
+.composer-input-row {
+  display: grid;
+  grid-template-columns: auto auto minmax(0, 1fr) auto;
+  gap: 10px;
+  align-items: end;
 }
 
 .emoji-tray {
@@ -590,6 +623,7 @@ textarea {
   resize: none;
   min-height: 54px;
   max-height: 160px;
+  line-height: 1.35;
 }
 
 .attachment-preview {
@@ -730,16 +764,12 @@ textarea {
 
   .chat-topbar,
   .topbar {
-    padding: 16px;
-  }
-
-  .chat-topbar {
-    align-items: flex-start;
+    padding: 14px 14px 12px;
   }
 
   .chat-topbar-side {
-    width: 100%;
-    justify-content: flex-start;
+    flex: 0 0 auto;
+    gap: 8px;
   }
 
   .search-input {
@@ -748,21 +778,69 @@ textarea {
     max-width: none;
   }
 
+  .chat-topbar-meta h2 {
+    font-size: 1.08rem;
+  }
+
+  .chat-topbar-meta .muted {
+    font-size: 0.9rem;
+    line-height: 1.2;
+  }
+
+  .chat-details-panel {
+    padding: 0 14px 12px;
+  }
+
+  .chat-details-card {
+    border-radius: 20px;
+    padding: 14px;
+  }
+
   .message-row {
-    max-width: 90%;
+    max-width: 85%;
   }
 
-  .message-menu-trigger {
-    opacity: 1;
-    pointer-events: auto;
+  .composer {
+    gap: 8px;
+    padding: 10px 12px calc(10px + env(safe-area-inset-bottom, 0px));
   }
 
-  .composer-actions,
-  .composer-tools {
+  .composer-note {
     width: 100%;
+    font-size: 0.9rem;
   }
 
-  .primary-btn {
-    width: 100%;
+  .composer-input-row {
+    grid-template-columns: auto auto minmax(0, 1fr) auto;
+    gap: 8px;
+    align-items: center;
+  }
+
+  .composer-input-row .icon-btn {
+    width: 42px;
+    height: 42px;
+    padding: 0;
+    display: grid;
+    place-items: center;
+    border-radius: 999px;
+  }
+
+  textarea {
+    min-height: 46px;
+    max-height: 120px;
+    padding: 12px 14px;
+    border-radius: 24px;
+  }
+
+  .message-feed {
+    padding: 16px 14px 10px;
+  }
+
+  .message-meta {
+    font-size: 0.74rem;
+  }
+
+  .status-pill.warn {
+    display: none;
   }
 }

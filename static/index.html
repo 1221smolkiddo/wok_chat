@@ -4,6 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>WokChat</title>
+    <link rel="icon" type="image/svg+xml" href="/static/favicon.svg" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -73,12 +74,11 @@
       <section class="screen chat-screen hidden" id="chat-screen">
         <header class="chat-topbar">
           <button type="button" class="icon-btn back-btn" id="back-btn" aria-label="Back to chats">&#8592;</button>
-          <div class="chat-topbar-meta">
+          <button type="button" class="chat-topbar-meta" id="chat-profile-btn" aria-label="Open contact details">
             <h2 id="chat-title">Secure room</h2>
             <p class="muted" id="peer-name">Waiting for the other user</p>
-          </div>
+          </button>
           <div class="chat-topbar-side">
-            <input id="search-input" class="search-input chat-search" type="search" placeholder="Search" />
             <div class="topbar-actions">
               <button type="button" class="icon-btn profile-btn" id="chat-menu-btn" aria-label="Open chat menu">&#8942;</button>
               <div class="profile-menu hidden" id="chat-menu">
@@ -90,6 +90,18 @@
           </div>
         </header>
 
+        <section class="chat-details-panel hidden" id="chat-details-panel">
+          <div class="chat-details-card">
+            <p class="eyebrow">Conversation</p>
+            <h3 id="chat-details-name">Secure room</h3>
+            <p class="muted" id="chat-details-status">Waiting for the other user</p>
+            <label class="chat-search-label" for="search-input">
+              <span>Search messages</span>
+              <input id="search-input" class="search-input chat-search" type="search" placeholder="Search in chat" />
+            </label>
+          </div>
+        </section>
+
         <div class="typing-strip" id="typing-indicator"></div>
 
         <div class="message-feed" id="message-feed">
@@ -100,30 +112,27 @@
         </div>
 
         <form class="composer" id="composer">
-          <div class="composer-tools">
-            <button type="button" class="icon-btn" id="attach-btn" title="Attach photo, video, or audio">+</button>
-            <button type="button" class="icon-btn" id="emoji-btn" title="Insert emoji">&#9786;</button>
-            <button type="button" class="icon-btn" id="record-btn" title="Record voice note">Mic</button>
-            <span class="composer-note" id="composer-note">Text, image, video, or voice message</span>
-          </div>
+          <div class="composer-note" id="composer-note">Text, image, video, or voice message</div>
           <div class="emoji-tray hidden" id="emoji-tray"></div>
           <div class="reply-preview hidden" id="reply-preview"></div>
-          <textarea
-            id="message-input"
-            rows="1"
-            maxlength="4000"
-            placeholder="Message"
-          ></textarea>
-          <div class="attachment-preview hidden" id="attachment-preview"></div>
-          <div class="composer-actions">
-            <input
-              class="hidden"
-              id="file-input"
-              type="file"
-              accept="image/*,video/*,audio/*,.heic,.heif,.jpg,.jpeg,.png,.webp,.gif,.mp4,.mov,.webm,.mp3,.m4a,.wav,.ogg"
-            />
-            <button type="submit" class="primary-btn" id="send-btn">Send</button>
+          <div class="composer-input-row">
+            <button type="button" class="icon-btn" id="attach-btn" title="Attach photo, video, or audio">+</button>
+            <button type="button" class="icon-btn" id="emoji-btn" title="Insert emoji">&#9786;</button>
+            <textarea
+              id="message-input"
+              rows="1"
+              maxlength="4000"
+              placeholder="Message"
+            ></textarea>
+            <button type="button" class="icon-btn" id="record-btn" title="Record voice note">Mic</button>
           </div>
+          <div class="attachment-preview hidden" id="attachment-preview"></div>
+          <input
+            class="hidden"
+            id="file-input"
+            type="file"
+            accept="image/*,video/*,audio/*,.heic,.heif,.jpg,.jpeg,.png,.webp,.gif,.mp4,.mov,.webm,.mp3,.m4a,.wav,.ogg"
+          />
         </form>
       </section>
     </main>

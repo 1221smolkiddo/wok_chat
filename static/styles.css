@@ -605,25 +605,16 @@ label {
   align-items: end;
 }
 
-.emoji-tray {
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-}
-
-.emoji-pill {
-  min-width: 42px;
-  padding: 8px 10px;
-  border: 1px solid var(--border);
-  border-radius: 999px;
-  background: color-mix(in srgb, var(--panel) 92%, transparent);
-}
-
 textarea {
   resize: none;
   min-height: 54px;
   max-height: 160px;
   line-height: 1.35;
+}
+
+.send-btn {
+  background: linear-gradient(135deg, var(--accent), #1fba91);
+  color: white;
 }
 
 .attachment-preview {
@@ -823,6 +814,11 @@ textarea {
     display: grid;
     place-items: center;
     border-radius: 999px;
+  }
+
+  .send-btn {
+    width: 46px;
+    height: 46px;
   }
 
   textarea {

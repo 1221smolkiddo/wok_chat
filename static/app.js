@@ -1,20 +1,8 @@
 const COMMON_REACTIONS = ["\u{1F44D}", "\u2764\uFE0F", "\u{1F602}", "\u{1F62E}", "\u{1F64F}", "\u{1F525}"];
-const EMOJI_SHORTCUTS = [
-  "\u{1F600}",
-  "\u{1F602}",
-  "\u{1F970}",
-  "\u{1F62D}",
-  "\u{1F64F}",
-  "\u2764\uFE0F",
-  "\u{1F525}",
-  "\u{1F44D}",
-  "\u{1F389}",
-  "\u{1F319}",
-];
 
 const state = {
   token: sessionStorage.getItem("wokchat_token") || "",
-  theme: localStorage.getItem("wokchat_theme") || "light",
+  theme: localStorage.getItem("wokchat_theme") || "dark",
   me: null,
   peer: null,
   messages: [],
@@ -59,9 +47,8 @@ const retentionPill = document.getElementById("retention-pill");
 const toastRegion = document.getElementById("toast-region");
 const fileInput = document.getElementById("file-input");
 const attachBtn = document.getElementById("attach-btn");
-const emojiBtn = document.getElementById("emoji-btn");
-const emojiTray = document.getElementById("emoji-tray");
 const recordBtn = document.getElementById("record-btn");
+const sendBtn = document.getElementById("send-btn");
 const clearChatBtn = document.getElementById("clear-chat-btn");
 const attachmentPreview = document.getElementById("attachment-preview");
 const composerNote = document.getElementById("composer-note");
@@ -149,8 +136,8 @@ function detectFileKind(file) {
 function setUploadingState(isUploading) {
   state.isUploading = isUploading;
   attachBtn.disabled = isUploading;
-  emojiBtn.disabled = isUploading;
   recordBtn.disabled = isUploading;
+  sendBtn.disabled = isUploading;
   messageInput.disabled = isUploading;
   messageInput.placeholder = isUploading ? "Sending..." : "Message";
 }
@@ -322,6 +309,7 @@ function openChatScreen() {
   if (state.token) composer.classList.remove("hidden");
   scheduleRender(true);
   if (window.innerWidth > 760) messageInput.focus();
+  syncComposerToViewport();
 }
 
 function updatePeerStatus() {
@@ -467,6 +455,7 @@ function clearPendingFile() {
   attachmentPreview.classList.add("hidden");
   composerNote.textContent = "Text, image, video, or voice message";
   fileInput.value = "";
+  syncComposerToViewport();
 }
 
 function renderPendingFile() {
@@ -509,6 +498,7 @@ function renderPendingFile() {
   removeBtn.textContent = "Remove attachment";
   removeBtn.addEventListener("click", clearPendingFile);
   attachmentPreview.appendChild(removeBtn);
+  syncComposerToViewport();
 }
 
 function setReplyTarget(message) {
@@ -559,13 +549,23 @@ async function startRecording() {
     state.recorderStream = null;
     state.recorder = null;
     state.isRecording = false;
-    recordBtn.textContent = "Mic";
+    recordBtn.textContent = "\u{1F3A4}";
+    syncComposerToViewport();
   });
   state.recorder.start();
 }
 
 function stopRecording() {
   if (state.recorder && state.isRecording) state.recorder.stop();
+}
+
+function syncComposerToViewport() {
+  if (!window.visualViewport) return;
+  const keyboardInset = Math.max(0, window.innerHeight - window.visualViewport.height - window.visualViewport.offsetTop);
+  composer.style.bottom = `${keyboardInset}px`;
+  if (state.currentScreen === "chat") {
+    feed.style.paddingBottom = `${24 + composer.offsetHeight}px`;
+  }
 }
 
 function sendTyping(isTyping) {
@@ -618,16 +618,6 @@ async function clearChat() {
   } catch (error) {
     showToast(error.message, "error");
   }
-}
-
-function insertEmoji(emoji) {
-  const start = messageInput.selectionStart ?? messageInput.value.length;
-  const end = messageInput.selectionEnd ?? messageInput.value.length;
-  messageInput.value = `${messageInput.value.slice(0, start)}${emoji}${messageInput.value.slice(end)}`;
-  messageInput.focus();
-  const cursor = start + emoji.length;
-  messageInput.setSelectionRange(cursor, cursor);
-  messageInput.dispatchEvent(new Event("input"));
 }
 
 function openLightbox(src, alt) {
@@ -926,15 +916,6 @@ function connectSocket() {
 
 async function bootstrap() {
   applyTheme(state.theme);
-  emojiTray.innerHTML = "";
-  EMOJI_SHORTCUTS.forEach((emoji) => {
-    const button = document.createElement("button");
-    button.type = "button";
-    button.className = "emoji-pill";
-    button.textContent = emoji;
-    button.addEventListener("click", () => insertEmoji(emoji));
-    emojiTray.appendChild(button);
-  });
   try {
     state.config = await api("/api/config");
     retentionPill.textContent = `${state.config.message_ttl_hours}h auto-delete`;
@@ -1031,7 +1012,6 @@ composer.addEventListener("submit", async (event) => {
 });
 
 attachBtn.addEventListener("click", () => fileInput.click());
-emojiBtn.addEventListener("click", () => emojiTray.classList.toggle("hidden"));
 profileBtn.addEventListener("click", () => profileMenu.classList.toggle("hidden"));
 chatMenuBtn.addEventListener("click", () => chatMenu.classList.toggle("hidden"));
 backBtn.addEventListener("click", openHomeScreen);
@@ -1120,6 +1100,7 @@ messageInput.addEventListener("input", () => {
   sendTyping(Boolean(messageInput.value.trim()));
   clearTimeout(state.typingTimeout);
   state.typingTimeout = setTimeout(() => sendTyping(false), 1200);
+  syncComposerToViewport();
 });
 
 messageInput.addEventListener("keydown", (event) => {
@@ -1127,6 +1108,13 @@ messageInput.addEventListener("keydown", (event) => {
     event.preventDefault();
     composer.requestSubmit();
   }
+});
+
+messageInput.addEventListener("focus", () => {
+  window.setTimeout(() => {
+    syncComposerToViewport();
+    messageInput.scrollIntoView({ block: "nearest" });
+  }, 80);
 });
 
 searchInput.addEventListener("input", () => {
@@ -1158,9 +1146,6 @@ document.addEventListener("click", (event) => {
     state.activeMenuId = null;
     scheduleRender();
   }
-  if (!event.target.closest(".emoji-tray") && !event.target.closest("#emoji-btn")) {
-    emojiTray.classList.add("hidden");
-  }
 });
 
 confirmCancelBtn.addEventListener("click", closeConfirmDialog);
@@ -1180,5 +1165,11 @@ lightboxClose.addEventListener("click", closeLightbox);
 document.addEventListener("keydown", (event) => {
   if (event.key === "Escape" && !lightbox.classList.contains("hidden")) closeLightbox();
 });
+
+if (window.visualViewport) {
+  window.visualViewport.addEventListener("resize", syncComposerToViewport);
+  window.visualViewport.addEventListener("scroll", syncComposerToViewport);
+}
+window.addEventListener("resize", syncComposerToViewport);
 
 bootstrap();

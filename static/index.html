@@ -113,18 +113,17 @@
 
         <form class="composer" id="composer">
           <div class="composer-note" id="composer-note">Text, image, video, or voice message</div>
-          <div class="emoji-tray hidden" id="emoji-tray"></div>
           <div class="reply-preview hidden" id="reply-preview"></div>
           <div class="composer-input-row">
             <button type="button" class="icon-btn" id="attach-btn" title="Attach photo, video, or audio">+</button>
-            <button type="button" class="icon-btn" id="emoji-btn" title="Insert emoji">&#9786;</button>
+            <button type="button" class="icon-btn" id="record-btn" title="Record voice note">&#127908;</button>
             <textarea
               id="message-input"
               rows="1"
               maxlength="4000"
               placeholder="Message"
             ></textarea>
-            <button type="button" class="icon-btn" id="record-btn" title="Record voice note">Mic</button>
+            <button type="submit" class="icon-btn send-btn" id="send-btn" title="Send message">&#10148;</button>
           </div>
           <div class="attachment-preview hidden" id="attachment-preview"></div>
           <input

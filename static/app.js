@@ -570,12 +570,17 @@ function scrollFeedToLatest() {
 }
 
 function syncComposerToViewport() {
-  if (!window.visualViewport) return;
-  const keyboardInset = Math.max(0, window.innerHeight - window.visualViewport.height - window.visualViewport.offsetTop);
+  const viewport = window.visualViewport;
+  const keyboardInset = viewport
+    ? Math.max(0, window.innerHeight - viewport.height - viewport.offsetTop)
+    : 0;
   composer.style.bottom = `${keyboardInset}px`;
   if (state.currentScreen === "chat") {
-    feed.style.paddingBottom = `${24 + composer.offsetHeight}px`;
-    scrollFeedToLatest();
+    const bottomPadding = Math.max(composer.offsetHeight + keyboardInset + 16, 120);
+    feed.style.paddingBottom = `${bottomPadding}px`;
+    if (document.activeElement === messageInput || state.peerTyping) {
+      scrollFeedToLatest();
+    }
   }
 }
 
@@ -832,7 +837,7 @@ function renderMessages(scrollToBottom = false) {
 }
 
 function scheduleRender(scrollToBottom = false) {
-  if (state.renderQueued) return;
+  if (state.renderQueued && !scrollToBottom) return;
   state.renderQueued = true;
   window.requestAnimationFrame(() => renderMessages(scrollToBottom));
 }
@@ -1122,7 +1127,6 @@ messageInput.addEventListener("focus", () => {
   window.setTimeout(() => {
     syncComposerToViewport();
     scrollFeedToLatest();
-    messageInput.scrollIntoView({ block: "nearest" });
   }, 80);
 });
 

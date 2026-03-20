@@ -48,6 +48,7 @@ body {
   font-family: "Manrope", sans-serif;
   color: var(--text);
   background: var(--bg-layer);
+  overscroll-behavior-y: none;
 }
 
 h1,
@@ -325,6 +326,7 @@ label {
   display: grid;
   grid-template-rows: auto auto 1fr auto;
   height: calc(100dvh - 36px);
+  overflow: hidden;
 }
 
 .chat-topbar-meta {
@@ -419,6 +421,9 @@ label {
   display: flex;
   flex-direction: column;
   gap: 16px;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: auto;
 }
 
 .empty-state {
@@ -434,7 +439,6 @@ label {
   flex-direction: column;
   gap: 8px;
   max-width: min(76%, 640px);
-  animation: fadeInUp 220ms ease;
 }
 
 .message-row.mine {
@@ -608,6 +612,8 @@ label {
   background: var(--panel-strong);
   position: sticky;
   bottom: 0;
+  z-index: 6;
+  box-shadow: 0 -16px 32px rgba(0, 0, 0, 0.08);
 }
 
 .composer-tools,
@@ -745,17 +751,6 @@ textarea {
   color: white;
 }
 
-@keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(8px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
 @media (max-width: 760px) {
   .app-shell {
     padding: 0;
@@ -771,6 +766,7 @@ textarea {
 
   .chat-screen {
     height: 100dvh;
+    grid-template-rows: auto auto 1fr auto;
   }
 
   .chat-topbar,
@@ -814,6 +810,12 @@ textarea {
   .composer {
     gap: 8px;
     padding: 10px 12px calc(10px + env(safe-area-inset-bottom, 0px));
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border-top-left-radius: 18px;
+    border-top-right-radius: 18px;
   }
 
   .composer-note {
@@ -849,7 +851,7 @@ textarea {
   }
 
   .message-feed {
-    padding: 16px 14px 10px;
+    padding: 16px 14px 120px;
   }
 
   .typing-strip {
